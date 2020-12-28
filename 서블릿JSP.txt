@@ -1,0 +1,74 @@
+02 웹서버 프로그램이란
+
+그렇다면 웹서버 프로그램은 무엇인지 이해하는것이 중요하다
+
+예전에는 서버프로그램이라는것이 없었다.
+콘솔,윈도우 프로그램 이정도 차이
+
+사용자가 컴퓨터를 바로 사용하는것이었다.
+
+하지만 
+본점과 원산지가 있는데
+(클라이언트) (서버)
+본점에서 원산지에 있는 데이터를 보고싶어서 나누게 되었다.
+옛날에는 서버 클라이언트 동일한언어로 만들었는데 불편한점이 생김
+원래는 업데이트시 설치 재설치를 했는고 데이터전송 구현의 어려움이 부담되어서 웹을 사용하기 시작하였다.
+
+웹프로그래밍이란 서버 클라이언트 프로그램이 아니라
+웹에 서버클라이언트를 얹음
+
+
+03 웹서버 프로그램과 Servlet
+
+WEB vs WAS
+WEB은 WEB서버에 문서만 있는것이다
+WAS 사용자가 요구하는 내용이 동적이면 실행할수있는 DB와연동가능한것이 WAS (서비스를 할수있는 녀석이 추가적으로 설치되어있어야한다.)
+
+WAS 구성요소
+1.Server app = 동적으로 요구하는 내용을 문서로 만들어줄수있는것
+2. WAS = 코드를 찾아서 실행해줄수 있는 환경 Tomcat
+
+웹문서를 제공해주는 녀석 = webserver
+
+Servlet은?(서버 어플리케이션 조각)
+사용자가 요청하는 내용 GET:list/reg/edit/del
+
+04 톰캣9 설치하기(환경설정)
+
+05 톰캣9 설치하기- 웹문서 추가해보기
+- 웹서버는 예약되어있는 특정폴더가있고 그폴더에다가 문서를 저장하고 다른 원격에있는 컴퓨터 브라우저에서 리소스 이름을 입력하면 그 문서를 보여준다.
+
+06 톰캣9 설치하기 Context 사이트 추가하기
+
+Context란?(가상 경로)
+사이트가 커지다보면 파일 디렉토리가 많아질것이다.
+물리적으로는 두개의 사이트인데 실제는 하나의 사이트로 돌아가게 하는것이다.
+규모가 클경우에는 컨텍스트를 나눠서 작업하는 경우도있다.
+
+      <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
+	<Context path="it" docBase="C:\tools\apache-tomcat-9.0.41\webapps\ITWeb" previledged="true" />	//이 줄을 추가해준다.
+추가하게되면 localhost:8080/it/ 로 접근이 가능하다.
+
+07 처음으로 서블릿 프로그램 만들어보기
+-왜 웹서버 응용 프로그램을 Servlet이라고 명칭할까?
+
+Servlet은 기능에따라 나눠져있다.
+원래 Javas는 main() 함수를 중심으로 만든다.
+service()라는 함수로 만든다.
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.*;
+
+public class Nana extends HttpServlet
+{
+	public void service(HttpServletRequest request
+			, HttpServletResponse response)
+			throws IOException, ServletException
+	{
+		System.out.println("hello Servlet");
+	}
+}
+이런식으로 작성한 후에 cmd 에서 해당경로 에서 javac -cp <servlet-api.jar 경로> Nana.java 를 실행하면 에러없이 돌아가면완료된것
+$javac -cp C:\tools\apache-tomcat-9.0.41\lib\servlet-api.jar Nana.java
