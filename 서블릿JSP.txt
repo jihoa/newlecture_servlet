@@ -67,8 +67,41 @@ public class Nana extends HttpServlet
 			, HttpServletResponse response)
 			throws IOException, ServletException
 	{
-		System.out.println("hello Servlet");
+		System.out.println("hello Servlet");	//서버 콘솔에 출력된
 	}
 }
 이런식으로 작성한 후에 cmd 에서 해당경로 에서 javac -cp <servlet-api.jar 경로> Nana.java 를 실행하면 에러없이 돌아가면완료된것
 $javac -cp C:\tools\apache-tomcat-9.0.41\lib\servlet-api.jar Nana.java
+
+
+
+08 서블릿 객체 생성과 실행방법
+지난시간에 nana파일을 컴파일해서 클래스파일로만들었음
+
+둬야하는 위치
+/
+WEB-INF/				// 루트 아래에 WEB-INF 가 없으면 만들어야한다.
+	web.xml
+	classes/			//그아래에 classes 밑에다가 넣어야한다.
+		Nana.class
+
+넣고나서 http://newlecture.com/web-inf/classes/Nana.class
+이렇게 하면 절대로 되지 않는다. 이걸 사용자가 요청하는것도 문제고 요청한다고 주는것도 문제다.
+WEB-INF는 서버쪽에서만 사용할수있다. 클라이언트는 요청할수가없다.(비공개 영역)
+
+사용자가 요청하는 방법
+URL 과 매핑된 Servlet 코드를 찾아서 실행
+(약속된 매핑방식으로 요청)
+
+<servlet>
+	<servlet-name>na</servlet-name>
+	<servlet-class>Nana</servlet-class>	//2. 해당하는 클래스를 실행하겠다.
+</servlet>
+<servlet-mapping>
+	<servlet-name>na</servlet-name>
+	<url-pattern>/hello</url-pattern>	//1.hello라고 요청했을때
+</servlet-mapping>
+
+이렇게 등록을 해놓으면 사용자가 http://localhost/hello 를 입력했을때 hello라고 요청하고 요청에 해당하는 클래스를 실행해주겠다.
+
+
