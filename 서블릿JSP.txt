@@ -105,3 +105,43 @@ URL 과 매핑된 Servlet 코드를 찾아서 실행
 이렇게 등록을 해놓으면 사용자가 http://localhost/hello 를 입력했을때 hello라고 요청하고 요청에 해당하는 클래스를 실행해주겠다.
 
 
+09 서블릿(Servlet) 문자열 출력 
+
+자바 웹프로그래밍 
+웹이 담당하고있는 부분은 UI ,UI는 콘솔UI  윈도우UI 두개로 나뉨
+
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.*;
+
+public class Nana extends HttpServlet
+{
+	public void service(HttpServletRequest request					//HttpServletRequest 입력도구 
+			,HttpServletResponse response)				//HttpServletResponse 출력도구	
+			throws IOException, ServletException
+	{
+	 OutputStream os = response.getOutputStream();				//출력이나 입력을 할때는 Stream 을 쓰는것이 기본이다.
+	 PrintStream out = new PrintStream(os,true);					//byte나 바이너리로 출력할것이 아니기때문에 PrintStream 객체를 사용한다. 쉽게 출력가능 true: flush이다. 글자하나썼다고해서 보내는게아니고 버퍼가 8KB채워야보내는데 그냥 보내라
+	 out.println("Hello Servlet!!");
+	}
+}
+
+뭐하나 수정하면 절차가 불편하다. 그래서 이클립스를 사용하는것이다.
+
+문자열 출력이 기본이라면 이렇게 복잡하게 안해도된다 파일을 받아서 바이너리로 출력한다면 위와같이하지만
+문자열을 출력할때는 PrintStream을쓰고 PrintStream을 기본적으로 제공해주는 Getter가 있다.
+
+public class Nana extends HttpServlet
+{
+	public void service(HttpServletRequest request					//HttpServletRequest 입력도구 
+			,HttpServletResponse response)				//HttpServletResponse 출력도구	
+			throws IOException, ServletException
+	{
+
+	 PrintWriter = response.getWriter();							//자바에서는 Stream Writer두가지있는데 Writer는 다국어를 지원하기 때문에 Writer를 사용한다.
+	 out.println("Hello Servlet!!");
+	}
+}
+ 
+우리는 앞으로 간단하게 Writer를 얻어서 사용할것이다.

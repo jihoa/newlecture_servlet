@@ -8,6 +8,8 @@ public class Nana extends HttpServlet
 			, HttpServletResponse response)
 			throws IOException, ServletException
 	{
-		System.out.println("hello Servlet");
+		OutputStream os = response.getOutputStream();
+		PrintStream out = new PrintStream(os,true);
+		out.println("Hello Servlet!!");
 	}
 }
