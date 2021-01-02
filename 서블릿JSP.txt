@@ -90,8 +90,10 @@ WEB-INF/				// 루트 아래에 WEB-INF 가 없으면 만들어야한다.
 WEB-INF는 서버쪽에서만 사용할수있다. 클라이언트는 요청할수가없다.(비공개 영역)
 
 사용자가 요청하는 방법
-URL 과 매핑된 Servlet 코드를 찾아서 실행
+web.xml에서 URL 과 매핑된 Servlet 코드를 찾아서 실행 
 (약속된 매핑방식으로 요청)
+
+-web.xml
 
 <servlet>
 	<servlet-name>na</servlet-name>
@@ -159,4 +161,60 @@ public class Nana extends HttpServlet
 우리가 톰캣을 설치하기는 해씨만 was는 톰캣만 있는것이아니다.
 그래서 톰캣 9.0 선택하고 톰캣의 위치 홈디렉토리를 찾아주면 끝난다.
 
+11 이클립스를 이용한 서블릿 프로그래밍
 
+ctrl+f11 을 누르게되면 톰캣을 설정해놨는데 그것의 복사본이 생기는 것이다.
+창이뜨는것은 서버설정을 하겠다라는 뜻.
+실행이되었을때 이클립스 내에서 브라우저가 실행되는데 그것을 크롬이나 다른 브라우저로 설정할수도 있다.
+window=> Web Browser 에서 선택하면된다.
+
+html의 경우
+
+프로젝트 생성후에 홈디렉토리는 WebContent가 된다
+홈디렉토리에있는 문서를 그냥 요청한것이다. 컨텍스트 이름이 루트에 해당하는 프로젝트는 컨텍스트 명을 갖는것이 좋은것이 아니다.
+기본프로젝트이기때문에 컨텍스트명을 프로젝트명으로 쓰지않을것이다.
+
+컨텍스트명 변경 방법
+프로젝트 오른쪽클릭=> properties=>Web Project Settings
+
+서블릿의 경우
+패키지를 만들기위해서 Java Resources 로 간다 src라는곳에다가 만든다 기존에는 패키지명없이 만들었는데
+Package명은 com.newlecture.web 		// newlecture에서만드는 웹페이지
+로 만들자
+
+-Nana.java
+
+package com.newlecture.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class Nana extends HttpServlet {
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		PrintWriter out = resp.getWriter();
+		out.println("hello!");
+	}
+}
+
+다 작성하고나서 실행을하려면 매핑이 되어있어야하는데 매핑하기위해서는 web.xml에다가 매핑을했었다.
+WEB_INF안에 web.xml이 없으면 복사해온다.
+
+-web.xml
+<servlet>
+	<servlet-name>na</servlet-name>
+	<servlet-class>com.newlecture.web.Nana</servlet-class>		//원래는 <servlet-class>Nana</servlet-class> 클래스명만 적었지만 패키지명도있으면 적어야한다.
+</servlet>
+
+<servlet-mapping>
+	<servlet-name>na</servlet-name>
+	<url-pattern>/hello</url-pattern>
+</servlet-mapping>
+
+이렇게 까지 바꿔주면 전에는 Nana.java코드를 바꿔주었을때 실행하고 컴파일하고 배포하는 과정을 거쳐야하지만 ctrl+F11을 눌러주면 해결된다.

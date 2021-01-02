@@ -1,0 +1,7 @@
+1. Tomcat 에러
+
+Selection cannot be run on any server.
+
+프로젝트에 서버가 제대로 등록되지 않아서 발생하는 오류
+
+프로젝트=> properties=>server => "Always use the following server when running this project: " 에 Tomcat v9.0 Server at localhost 선택
