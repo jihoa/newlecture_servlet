@@ -218,3 +218,39 @@ WEB_INF안에 web.xml이 없으면 복사해온다.
 </servlet-mapping>
 
 이렇게 까지 바꿔주면 전에는 Nana.java코드를 바꿔주었을때 실행하고 컴파일하고 배포하는 과정을 거쳐야하지만 ctrl+F11을 눌러주면 해결된다.
+
+12 어노테이션을 이용한 URL 매핑
+
+일단 어노테이션이란?
+ex)
+@WebServlet("/hello")		//클래스나 메소드에 붙어져있는 주석이다.
+				// 원래 주석은 컴파일러에 의해서 사라지지만 어노테이션은 컴파일러에 의해서 사라지지 않는다. 메타데이터라고 부르기도한다.
+
+
+web.xml에다가 서블릿과 URL을 매핑했는데 어노테이션을 이용해서 서블릿과 URL을 매핑하는 법을 알아보자
+어노테이션을 이용해서 실행하는데 영향을 줄수있다. 어노테이션으로 매핑정보를 실을수도 있다,
+매핑정보를 남길수도있다. web.xml 안가도 된다.
+
+web.xml에서
+
+서블릿 2. 대에서는 web.xml에서만 매핑이가능했다 하지만
+서블릿 3. 대에서는
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+  version="4.0"
+  metadata-complete="false">		// 매핑정보를 설정할때 true로 하게되면 모든 메타데이터(설정)는 web.xml에 있다.
+					// false로 할시에 여기외에도 어노테이션설정한게 있으니 찾아봐라 라는뜻
+					//true-> false로 바꿔주기
+
+web.xml 설정만 바꾸고 실행을 하게되면 안된다.
+
+다시 서블릿 파일인 Nana.java로 돌아가서
+
+@WebServlet("/hi")를 import문 밑에다가 추가해준다.
+성공
+
+Web.xml도 가능하고 어노테이션도 가능한데 어노테이션이 더 쉽다. 그리고 분업을할때도 훨씬 깔금하게 작업이 가능하다.
+
