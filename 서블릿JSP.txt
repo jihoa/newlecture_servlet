@@ -298,20 +298,47 @@ public class Nana extends HttpServlet {
 
 다음시간에는 문서를 보낼때 어떤형식으로 보낼때 어떻게 보낼지 한글을 쓰면 깨지는데 안깨지게 하는것을 알아볼것이다.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+14  한글과 콘텐츠 형식 출력하기
+
+서블릿을통해서 문자를 보내봤는데 사용자가 컨텐츠의 형식을 자의적으로 해석했다. 하지만 원래는 정해주고 보내주는것이맞다.
+
+package com.newlecture.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/hi")
+public class Nana extends HttpServlet {
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		resp.setCharacterEncoding("UTF-8");		//인코딩방식을 UTF 로 정하자! 이걸안하면 ??으로 뜸
+		resp.setContentType("text/html; charset=UTF-8");	//받은것을 어떻게 해석할까 콘텐츠타입은 무엇인지 정의하는 문구 UTF-8로보냈고 charset=UTF-8이기때문에 UTF-8로 읽자 더불어서 이녀석이 html문서이다.
+		PrintWriter out = resp.getWriter();
+		for(int i=0; i<100; i++)
+			out.println((i+1)+":안녕 <br />");
+		
+	}
+}
 
 
 
+하지만 이렇게 했음에도 불구하고 뚬궶 이런식으로뜬다.
+?? 나오는것은 아예 잘못전달 뚬궶은 인코딩을 바꿔주면 해결되는것
+크롬 개발자 도구에서 응답 헤더에 콘텐츠가 UTF-8 로 읽어져야한다고 심어줘야한다. 이렇게하지않으면 글자가 깨진다.
+서버에서 심어주도록하자
+resp.setContentType("text/html; charset=UTF-8"); 을작성해주고나면 한글도 잘표시된다.
+그리고 다시 크롬 개발자 도구에 가보면 Content-Type: text/html;charset=UTF-8이 응답헤더에 있는것을 확인할수 있다. 
 
 
-
-
-
-
-
-
-
-
-
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
