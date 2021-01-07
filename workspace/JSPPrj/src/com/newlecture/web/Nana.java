@@ -19,7 +19,10 @@ public class Nana extends HttpServlet {
 		
 		PrintWriter out = resp.getWriter();
 		
-		int cnt = Integer.parseInt(req.getParameter("cnt"));
+		String temp = req.getParameter("cnt");
+		int cnt=100;
+		if(temp != null && !temp.equals(""))
+			cnt= Integer.parseInt(temp);
 		
 		for(int i=0; i<cnt; i++)
 			out.println((i+1)+":¾È³ç Servlet<br />");
