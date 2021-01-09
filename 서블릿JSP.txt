@@ -500,14 +500,71 @@ request.setCharacterEncoding("UTF-8");
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+20 서블릿 필터(Servlet Filter)
+
+WAS(톰캣)가 사용자로부터 요청이 들어오면 적정한 소프트웨어를 실행해서 결과를 돌려주도록 되어있다.
+그 소프트웨어를 서블릿이라고 하는데 
+서블릿을 실행하게되면 메모리상에 존재하게될텐데 그 공간을 Servlet Cotainer라고하고 WAS는 서블릿을 실행시켜서 결과를 돌려주게 되고 그리고 사용되지않으면 컨테이너에서 삭제
+
+서블릿만 주구장창 만들었는데 또 만들수있는 오브젝트는 필터이다.
+사용자로 부터 입력을 받을때는  request.setCharacterEncoding("UTF-8"); 설정을 해야한다. 그렇다면 톰캣이 사용하고있는 방식을 UTF8로바꾸면 어떨까? 들어오는 입력에대한 입력을 UTF8로바꾸면된다
+하지만 그것은 부담스럽다 왜냐면 다른 서비스도 제공하기때문이다. 그러니까 우리꺼에만 영향을 주고싶은데 그렇다고해서 서블릿마다 이런작업하긴 불편하다. 그래서 중간에 위치할수있는 소프트웨어가 있다. 
+요청이 들어오면 요청을 서블릿을 실행하는 쪽으로 가는데 이 소프트웨어는 가로채기가 가능하다. 수문장역할을 하는것이다 이 수문장녀석은 서블릿을 실행할지 말지도 결정이 가능하다. 모든 서블릿이 가지고있는 기본설정을
+어차피 거쳐가는것이니까 다 영향을 주게할수도있다.
+먼저 실행되는것이 기본적이지만 response에도 영향을 주게하는것도 가능하다. 이녀석을 Filter라고 부른다.
+
+Filter를 만들어보자 원래있는 프로젝트에다가 만들지말고 새로운 프로젝트
+com.newlecture.web.filter 프로젝트를 생성하고
+그아래에 CharacterEncodingFilter를 만들자 Add를 눌러서 인터페이스를 추가하자 filter로 검색해서 javax.servlet.Filter 를 추가하자
+
+생성하고 난 이후에 		System.out.println("hello filter"); 을 설정해주자
+이렇게 필터를 생성하고 설정을 하면 어떠한 요청이 와도 필터가 자동으로 동작하게 된다. 요청이 올때마다 동작이되긴하지만 톰캣이 실행될때도 동작이된다.
+
+web.xml 에서 필터를 설정하자. 
+필터 설정할때 두가지가있다 서블릿처럼 xml도되고 어노테이션도된다 서블릿먼저하고 어노테이션으로 바꿔보자
+
+-web.xml
+
+<filter>										//현재 내가 어떤 클래스를 쓸까 와 어떤이름쓸지를 등록
+	<filter-name>characterEncodingFilter</filter-name>
+	<filter-class>com.newlecture.web.filter.CharacterEncodingFilter</filter-class>		//필터 패키지 + 필터 클래스명
+</filter>
+<filter-mapping>									//필터에대해서 어떤 매핑을 쓸까와 이름은 뭘로할지
+	<filter-name>characterEncodingFilter</filter-name>
+	<url-pattern>/*</url-pattern>						//어떤 URL을 사용할지를 정하는데 /*는 모든 URL
+</filter-mapping>
 
 
+noitce.reg가 정상적으로 실행되었는데 아무것도 안나온다. 왜 안나올까?  필터가 실행되었는데 서블릿실행으로 갈지말지는 필터가 결정하기 떄문이다.
+필터라는 녀석을 두고
 
+-CharacterEncodingFilter.java
 
+public class CharacterEncodingFilter implements Filter {
 
+	@Override
+	public void doFilter(ServletRequest request
+			, ServletResponse response
+			, FilterChain chain)					// 이 흐름을 다음녀석에게 전달 해줄까 말까는 얘가 결정한다.
+			throws IOException, ServletException {
+		System.out.println("before filter");				//요청이오면 이게 실행
+		req.setCharacterEncoding("UTF-8");				//모든 서블릿 실행전에 인코딩 작업할것이기 떄문에 여기다가 넣어준다.
+		chain.doFilter(request, response);				//다음 필터 혹은 서블릿으로 실행되게 한다. 	
+		System.out.println("after filter");				//다음 필터나 서블릿이 실행되고 나서 실행된다.
 
+	}
 
+}
 
+어노테이션으로 하는 방법을 알아보자
+
+-CharacterEncodingFilter.java
+
+import java.io.IOException;
+
+@WebFilter("/*")								// 이 문구만 사용해주면된다. 여러가지 불필요한 작업을 없앨수있다.
+
+public class CharacterEncodingFilter implements Filter {
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
