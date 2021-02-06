@@ -710,9 +710,64 @@ Calc2로 만들었으니 어노테이션도 바꿔주자
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+26 Application 객체와 그것을 사용한 상태 값 저장
 
+상태를 저장하기위해서 다뤘던정보를 잠깐 저장하기위해서 Application 객체를 사용하는 방법을 알아보자
 
+ex) 1번 서블릿을 여러분이 요청하게되면 1번 서블릿이 메모리에서 처리하면 1번서블릿이 메모리에서 사라진다. 
+그래서 서블릿이라는 녀석을 사용할때 그들간에 그자신간의 데이터를 저장할수있는 메모리 저장소를 사용하는것이 필요한데 그것이 서블릿 Context이다. 
+어플리케이션을 만들다보면 API중에서 Context 라는 이름을 가진아이들이 많다. Context라는 것은 문맥,책갈피 라는 사전적 의미를 가지고있다.
+책갈피는 책을 이어갈수있도록 하는 상태값을 표시하는 역할을 한다. 책을 읽을때 다음에 다시 읽을수있도록 해주는 공간이다.
 
+서블릿 컨텍스트:A라는 서블릿이 만든 결과를 저장하면 B라는 서블릿이 그 결과를 이어서 새로운 결과를 만들 수 있도록 하는 상태 저장공간
+
+웹어플리케이션에서는 어플리케이션 저장소라고 부르기도 한다.
+
+서버쪽에서 사용자 전달한 값이 있을텐데 그값을 저장할수있느냐, 다음 요청에서 그값을 꺼내볼수있느냐 그것이 우리가 알아볼내용이다.
+
+@WebServlet("/calc2")
+public class Calc2 extends HttpServlet {
+	
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletContext application =request.getServletContext();						//이 값을 저장해야하는데 어디다 저장해야하는가? request에보면 ServletContext()가있다. 이것이 어플리케이션 저장소이다 application이라는 변수에다가 getservletCOntext()를저장하자
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String v_ = request.getParameter("v");											//사용자가 전달하는 값은 하나만 전달한다.
+		String op = request.getParameter("operator"); 									//그리고 오퍼레이터를 같이 전달한다.
+		
+		int v= 0;																		// 기본값이 필요할까도 생각을 해봐야한다. 전달하는 내용이 값이없을때 기본값으로 받아야하나? 값입력x시 0으로 처리하기위해 v=0 기본값세팅
+		if(!v_.equals("")) v= Integer.parseInt(v_);
+		
+		//계산
+		if(op.equals("=")) {															//왜 if문에 =(equal)로했냐면 덧셈과 뺄셈은 하는일이 같다. 하지만 =는 계산하는것이다. 
+																						//아래에서 값을 읽어와야한다. 하나는 앞에서 저장했던내용이고 하나는 지금가져온내용으로 두가지를 읽어야한다.
+			
+			int x = (Integer)application.getAttribute("value");							//앞에서 저장한값을 어플리케이션저장소에서 꺼내와야하는데 application.getAttribute("담을떄사용했던 값")메소드를 사용한다. 그리고 (Integer)을 안했을 떄 빨간줄이 뜨는것은 Object로 값을 반환하기 때문이다.
+			int y = v;																	//지금사용자가 저장한값
+			String operator= (String)application.getAttribute("op");					//그래서 그 밸류값과 앞에서 저장했던값을 꺼내서 덧셈을 할지 뺄셈을 할지는 사용자가 저장했던 operator값을 꺼내서 봐야한다. 어플리케이션 저장소에서 읽어오자
+			int result=0;
+			
+			if(operator.equals("+"))			
+				result = x+y;
+			else
+				result = x-y;
+			response.getWriter().printf("result is %d", result);
+		
+		
+		}
+		// 값을 저장
+		else {
+			application.setAttribute("value", v);										//application에다가 두가지를 저장하자 v(값), op(연산자) setAttribute에다가 저장한다 어떻게 저장하냐면 map Collection처럼 key 와 value를 넣어준다.
+			application.setAttribute("op",op);  						 				//오퍼레이터도 같은 방식으로 저장해주기위해서 key와 value를 저장해주자 이것들을 두고두고 쓸수있다.																						//전달된내용이 op이 뭐냐인가에 따라서 저장해야할수도있고 계산이 될수도있다.	
+		}		
+	}
+}
+
+다 되는데 왜 화면이 하얗게 질리는지 그것이 아쉽지만 잘 동작하긴한다. 다음시간에 왜그런지 알아보자 중요한것은 application 저장소를 활용할수있는지가 중요하다.
+다음시간에 세션과 쿠키를 이용해서 저장소를 사용하기위한 적절한 시기와 장소를 알아보는것으로 하자.
+
+SetAttribute ,getAttribute를 사용해서 저장소를 사용하는 법을 알아보았다.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
