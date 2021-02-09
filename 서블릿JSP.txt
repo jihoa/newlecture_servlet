@@ -778,6 +778,46 @@ Application말고 cookie session객체 도 있다.
 
 오늘은 Session으로 바꿔보고 Session과 Application의 차이를 알아보자
 
+@WebServlet("/calc2")
+public class Calc2 extends HttpServlet {
+	
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session =request.getSession();
+		
+		
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String v_ = request.getParameter("v");							//사용자가 전달하는 값은 하나만 전달한다.
+		String op = request.getParameter("operator"); 						//그리고 오퍼레이터를 같이 전달한다.
+		
+		int v= 0;										// 기본값이 필요할까도 생각을 해봐야한다. 전달하는 내용이 값이없을때 기본값으로 받아야하나? 값입력x시 0으로 처리하기위해 v=0 기본값세팅
+		if(!v_.equals("")) v= Integer.parseInt(v_);
+		
+		//계산
+		if(op.equals("=")) {									//왜 if문에 =(equal)로했냐면 덧셈과 뺄셈은 하는일이 같다. 하지만 =는 계산하는것이다. 
+												//아래에서 값을 읽어와야한다. 하나는 앞에서 저장했던내용이고 하나는 지금가져온내용으로 두가지를 읽어야한다.
+			
+			int x = (Integer)session.getAttribute("value");	
+			int y = v;									//지금사용자가 저장한값
+
+			String operator= (String)session.getAttribute("op");
+			int result=0;
+			
+			if(operator.equals("+"))			
+				result = x+y;
+			else
+				result = x-y;
+			response.getWriter().printf("result is %d", result);
+		
+		
+		}
+		// 값을 저장
+		else {
+			session.setAttribute("value", v);
+			session.setAttribute("op",op);
+
+
 위의코드는 application을 session으로 바꾸고 HttpSession session =request.getSession();  세션객체를 사용한것밖에없다.
 왜 이렇게 했냐면 Session객체도 Application 객체와 같이 상태를 저장하기 위해서 사용하기 때문이다. 실행해서 결과가 같은지 확인해보자
 
@@ -854,23 +894,113 @@ void setMaxInactiveInterval(int interval)		//사용자가 요청을 했다. 그�
 세션 타임아웃을 정수(초)로 설정
 
 
-
-
-
-
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+29 Cookie를 이용해 상태값 유지하기
+
+두가지외에 쿠키라는것을 이용해 상태값을 저장할수있다.
+
+서버에다가 값을 넣었다가 값을 이용하는 방법은 크게 두가지이다. Application공간(모두 사용가능) Session(개인 사용가능)
+Session or Application에 저정할것인지는 데이터의 속성에 따라서 적절하게 쓰면된다.
+또하나 봐야될것이 무엇이냐면 피트니스 센터에 들어가는것이랑 정말 비슷하다. 공용 공간도 있고 사물함도 있다.
+
+Cookie : 상태값을 클라이언트가 가지고있다가 가져왔다 가져왔다 하는것이다. 
+왔다갔다해도 값은 유지가 된다. 
+
+값을 저장할수있는공간
+서버쪽에 저장:Application,Session
+클라이언트에저장: Cookie
+
+3가지 저장소를 쓸때는 특징과 장단점이 있다. 다음시간에 알아보자
+
+쿠키를 사용하는 방법에 포커스를 맞춰보자
+
+클라이언트가 서버에 요청할때 (Request) 가져갈수있는값 3가지
+
+1. Header(브라우저가 알아서 담아줌)
+-getHeader()		//헤더를 얻어올때사용
+2. 사용자데이터(내가보내는 데이터) 
+-getParameter() 		//Ap함수를 사용함
+3. 쿠키를 가져간다.(브라우저가 보내줌)
+-getCookie()		//쿠키를 얻는 함수
+
+서버에서 클라이언트로 응답할때(Response) 가져갈수있는 함수
+-AddCookie()		//Server에서 쿠키라는 녀석은 사용자에게 보낼때 addCookie라는 녀석은 보낸다. 브라우저에다가 저장하겠다 할때 사용한다.
+
+쿠키를 이용하는 간단한 예제
+
+1.쿠키 저장하기 	//서버쪽에서는 (상태)값을 저장해야겠다. 근데 Application에도 싫고 Session에도 싫다 그러면 클라이언트에 보내겠다.
+
+Cookie cookie = new Cookie("c",String.valueOf(result));		//쿠키는 "c"(키)와 String.valueOf(result) (값)으로 나뉜다. (c라는 키로서 값을 보내게되면)
+response.addCookie(cookie);					//addCookie라는것을 통해서 출력을하게되는것이다. 그러면 response에 심어진것을 브라우저가 읽을수 있다. 그것을 자기가 갖게된다.
+
+2.쿠키 읽기
+Cookie[] cookies = request.getCookies();			//브라우저가 그 사이트로 쿠키를 요청하면 서버에서는  getCookies() (복수형이다!) 배열로온다. 하나가 아니라 여러개일수 있기떄문에 키와 값 여러개로온다.
+String _c="";
+
+if(cookies != null)						//배열이니까 심었던 쿠키를 찾는 과정이 있어야한다. for문돌리면서 키값을 찾아서 키값에 해당하는 밸류를 찾아야한다.
+	for (Cookie cookie : cookies)
+		if("c".equals(cookie.getName()))
+			_c = cookie.getValue();
+
+이런 불편한점이있지만 사용자에게 브라우저에게 값을 위임했다가 가져올수있다. 
+
+
+public class Calc2 extends HttpServlet {
+	
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		Cookie[] cookies =request.getCookies();											//3.사용자가 쿠키를 보냈으니까 다음요청이 들어왔을떄 보내줄것이다. 그러기위해서 쿠키를 읽어야한다. 쿠키를 읽기위해 request.getCookie()메소드를 사용하고 쿠키가 Cookies라는 배열로 읽히기 때문에 Cookie[]라는 배열로 선언해준다.
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		String v_ = request.getParameter("v");											
+		String op = request.getParameter("operator"); 									.
+		
+		int v= 0;														
+		if(!v_.equals("")) v= Integer.parseInt(v_);
+		
+		//계산
+		if(op.equals("=")) {															
+																	//4. 쿠키가왔으니 읽어야하는데 읽는곳은 이곳이다.  
+			int x=0;														//6. x가 value가 담기는 값인데 일단 초기화 하도록하자
+			for(Cookie c : cookies)												//8. 찾는작업이 여러번이니 for문 Cookies라는 배열에서 꺼내서 하나씩 Cookie c에 넣겠다.
+			if(c.getName().equals("value"))	{										//5. 첫번째 쿠키를 꺼내면 getName()이름이있다. 이 이름이 "value"가 있는지? if문을 쓰자.
+				x= Integer.parseInt(c.getValue());										//7.그 value가 찾아졌다하면 c.getValue()그 값을 가져온다 근데 빨간글씨뜬다 반환값이 String이라서그렇다 정수형으로바꾸자
+				break;													//9. 조건문을 두개 문장이 들어갈건데 찾았으면 그만검색 break;
+				}
+			
+			int y = v;																				
+			String operator ="";												//10.op값을 쿠키에서 찾는과정 value와동일
+			for(Cookie c : cookies)					
+				if(c.getName().equals("op")){			
+					operator= c.getValue();				
+					break;									
+					}
+			int result=0;
+			
+			if(operator.equals("+"))			
+				result = x+y;
+			else
+				result = x-y;
+			response.getWriter().printf("result is %d", result);
+		}
+		// 값을 저장
+		else {
+			Cookie valueCookie= new Cookie("value", String.valueOf(v));								//1. 심는것이니까 여기서 부터 시작 Cookie를 키와 밸류값으로 각각 value와 op를 주자 빨간줄이 뜨는데 그이유는 op는 문자열 v는 정수형이어서다 그래서 문자열로 변환해주는 메소드인 String.valueOf(v)를 사용해주자 쿠키로 보낼수있는값은 문자열만 가능하기때문 문자열중에서도 UTF로 보내야한다. 쿠키라는 녀석은 문자열로만 저장하는 한계가있지만 JSON XML을 이용하면 다양한형태로 저장가능
+			Cookie opCookie= new Cookie("op",op);
+			response.addCookie(valueCookie);											//2-1. 쿠키 두개를 만들었을 뿐이고클라이언트에게 보내기위해서 addCookie()메소드를 사용하자
+			response.addCookie(opCookie);											//2-2. 어떻게 전달이되냐면 response header에 심어지는 형태로 전달이된다. 이것이 클라이언트로 갔으니까 브라우저가 '쿠키가 왔네!' 하면서 브라우저가 잘저장하고있을것이다.
+		}															//2-3. 쿠키가 전달되면 크롬 ▶ 설정 ▶ 사이트설정에 보면 쿠키라는 항목이 있다. ▶쿠키 에서 사이트에서 쿠키 데이터를 저장하고 읽도록 허용(권장) 이라는 항목이있는데 요즘은 대부분 허용하는데 안될수도있다는 것을 알아둬야한다. 그리고 쿠키데이터보기라는 항목이있는데 클릭해보면 ▶ 사이트 주소가 있다 사이트주소들이 나한테 보낸 쿠키들이보인다. 클릭해보면 쿠키값도 확인할수있다. 언제 생성 만료도 확인가능하다. 
+	}
+}
 
 
 
-
-
-
-
-
-
-
-
+이렇게 불편하기는하지만 쿠키라는것이 있기 때문에 또다른방법이 생긴것이다. 쿠키를 이용하는방식으로 코드를 바꿔봤다.
+쿠키를 읽을때에는 여러개의 쿠키가 있을수 있으므로 찾아봐야한다는 불편함이 있을수있지만 쿠키를 이용해서 사용자 브라우저에 값을 저장했다가 사용할수 있다.
+장단점은 다음시간에 알아보도록하자 
+실행을해봤더니 결과가 똑같다! 왜 세가지 방식을 쓸까? 세가지방식을 쓰라는게 아니라 그 장단점을 보고 적절하게 사용하라는것이다.
 
 
 
