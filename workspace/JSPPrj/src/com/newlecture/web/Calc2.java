@@ -72,8 +72,9 @@ public class Calc2 extends HttpServlet {
 //			session.setAttribute("op",op);
 			Cookie valueCookie= new Cookie("value", String.valueOf(v));					//1. 심는것이니까 여기서 부터 시작 Cookie를 키와 밸류값으로 각각 value와 op를 주자 빨간줄이 뜨는데 그이유는 op는 문자열 v는 정수형이어서다 그래서 문자열로 변환해주는 메소드인 String.valueOf(v)를 사용해주자 쿠키로 보낼수있는값은 문자열만 가능하기때문 문자열중에서도 UTF로 보내야한다. 쿠키라는 녀석은 문자열로만 저장하는 한계가있지만 JSON XML을 이용하면 다양한형태로 저장가능
 			Cookie opCookie= new Cookie("op",op);
-			valueCookie.setPath("/Calc2");
-			opCookie.setPath("/Calc2");
+			valueCookie.setPath("/calc2");
+			valueCookie.setMaxAge(24*60*60);
+			opCookie.setPath("/calc2");
 			response.addCookie(valueCookie);											//2-1. 쿠키 두개를 만들었을 뿐이고클라이언트에게 보내기위해서 addCookie()메소드를 사용하자
 			response.addCookie(opCookie);												//2-2. 어떻게 전달이되냐면 response header에 심어지는 형태로 전달이된다. 이것이 클라이언트로 갔으니까 브라우저가 '쿠키가 왔네!' 하면서 브라우저가 잘저장하고있을것이다.
 		}																				//2-3. 쿠키가 전달되면 크롬 ▶ 설정 ▶ 사이트설정에 보면 쿠키라는 항목이 있다. ▶쿠키 에서 사이트에서 쿠키 데이터를 저장하고 읽도록 허용(권장) 이라는 항목이있는데 요즘은 대부분 허용하는데 안될수도있다는 것을 알아둬야한다. 그리고 쿠키데이터보기라는 항목이있는데 클릭해보면 ▶ 사이트 주소가 있다 사이트주소들이 나한테 보낸 쿠키들이보인다. 클릭해보면 쿠키값도 확인할수있다. 언제 생성 만료도 확인가능하다. 
