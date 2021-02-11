@@ -77,6 +77,8 @@ public class Calc2 extends HttpServlet {
 			opCookie.setPath("/calc2");
 			response.addCookie(valueCookie);											//2-1. 쿠키 두개를 만들었을 뿐이고클라이언트에게 보내기위해서 addCookie()메소드를 사용하자
 			response.addCookie(opCookie);												//2-2. 어떻게 전달이되냐면 response header에 심어지는 형태로 전달이된다. 이것이 클라이언트로 갔으니까 브라우저가 '쿠키가 왔네!' 하면서 브라우저가 잘저장하고있을것이다.
+	
+			response.sendRedirect("calc2.html");										//백지를 받지않기위해서 사용자가 돌려줄때 response.라는 출력도구중에는 sendRedirect()라는게 있다 여기서 다른페이지로 전환할수있는것이다. 
 		}																				//2-3. 쿠키가 전달되면 크롬 ▶ 설정 ▶ 사이트설정에 보면 쿠키라는 항목이 있다. ▶쿠키 에서 사이트에서 쿠키 데이터를 저장하고 읽도록 허용(권장) 이라는 항목이있는데 요즘은 대부분 허용하는데 안될수도있다는 것을 알아둬야한다. 그리고 쿠키데이터보기라는 항목이있는데 클릭해보면 ▶ 사이트 주소가 있다 사이트주소들이 나한테 보낸 쿠키들이보인다. 클릭해보면 쿠키값도 확인할수있다. 언제 생성 만료도 확인가능하다. 
 	}
 }
