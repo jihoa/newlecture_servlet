@@ -1180,4 +1180,123 @@ calc2.html을 복사해서 calc3.html을 만들도록 하자 Calc2.java도 복�
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+35 처음이자 마지막으로 동적인 페이지 서블릿으로 직접 만들기
+
+계산기페이지를 동적으로 만들어야할필요가있다라고 이야기하고 그 페이지를 만들기위한 html을 준비했는데 오늘은 서블릿으로 만들려고한다. 
+오늘 제목이 처음이자 마지막으로 동적인페이지를 직접 만들기인데 그렇다면 앞으로 다음에는 동적인페이지를 서블릿으로 안만들까? 그렇다
+왜냐하면 그것이 JSP를 배워야하는이유이다. 이유는 나중에 살펴보고 또하나는 서블릿을 만들기위해 새로운 서비스를 추가할건데 서비스함수에다가 동적인 페이지를 만드는 코드를 넣을것
+그런데 뒤에가보면 get방식과 post방식을 별도로 처리할수있는 메소드가 있어서 그 내용을 따로 설명할것, 그리고 두개로 나뉘어지는 서블릿을 하나로 합칠것이다.
+
+(저번에 만든) html페이지는 동적으로 만든 문서가아니라 한번 만들어 놓은 것을 계속해서 요청하는 그런형태의 정적인 페이지기때문에 숫자를 바꾸려고하면 숫자를 바꿀수없다. 그래서 동적인 문서로 바꿀것이다.
+(저번에 만든) 문서를 서블릿 코드로 만드려고하는데 다시 이야기하면 <td class="output" colspan="4">0</td>를 출력할수 있게끔 하려면 서블릿을 만들어야한다. Calc3.java를 복붙해서 CalcPage.java로 만들자
+
+@WebServlet("/calcpage")
+public class CalcPage extends HttpServlet {
+	
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
+		
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");				
+	}
+}
+출력을 위한 설정을 제외하고 전부 지우자 그리고 그아래에다가 calc3.html을 전부 복사해서 CalcPage.java에다가 붙여넣자 그러면 무조건 에러가 날것이다. 왜냐면 자바에서 구문에 맞지않는 키워드가 막등장해서이다.
+그러면 이걸 복붙하자는게 아니고 response.getWriter()를 사용해서 출력하도록하자 PrintWriter out =response.getWriter();
+이 out이라는 녀석이 html을 출력할것이다.
+
+
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");	
+		PrintWriter out =response.getWriter();
+
+		out.write("<!DOCTYPE html>");			//out.write를 이용해 문자열로 출력할것이다.
+		out.write("<html>");
+		out.write("<head>");
+		out.write("<meta charset=\"UTF-8\">");
+		out.write("<title>Insert title here</title>");
+		out.write("<style>");
+		out.write("input{");
+		out.write("width:50px;");
+		out.write("height:50px;");
+		out.write("}");
+		out.write(".output{");
+		out.write("height:50px;");
+		out.write("background: #e9e9e9;");
+		out.write("font-size:24px;");
+		out.write("font-weight:bold;");
+		out.write("text-align:right;");
+		out.write("padding:0px 5px;");
+		out.write("}");
+		out.write("</style>");
+		out.write("</head>");
+		out.write("<body>");
+		out.write("<form action=\"calc3\" method=\"post\">");
+		out.write("<table>");
+		out.write("<tr>");
+		out.printf("<td class=\"output\" colspan=\"4\">%d</td>",3+4);		//printf로 한이유는 포맷팅이 가능하게끔 그리고 %d
+		out.write("</tr>");
+		out.write("<tr>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"CE\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"C\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"BS\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"÷\"/></td>");
+		out.write("</tr>");
+		out.write("<tr>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"7\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"8\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"9\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"X\"/></td>");
+		out.write("</tr>");
+		out.write("<tr>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"4\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"5\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"6\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"-\"/></td>");
+		out.write("</tr>");
+		out.write("<tr>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"1\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"2\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"3\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"+\"/></td>");
+		out.write("</tr>");
+		out.write("<tr>");
+		out.write("<td></td>");
+		out.write("<td><input type=\"submit\" name=\"value\" value=\"0\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"dot\" value=\".\"/></td>");
+		out.write("<td><input type=\"submit\" name=\"operator\" value=\"=\"/></td>");
+		out.write("</tr>");
+		out.write("</table>");			
+		out.write("</form>");
+		out.write("</body>");
+		out.write("</html>");
+
+이 작업이 불편하게 느껴지기도하고 단순하게 느껴지기도 해서 처음이자 마지막으로 할것이다. 시간이 오래걸린다. 실제로 이전에 처음 으로 자바 첫버전이 나오거나 그럴때에는 다 이렇게 했다.
+C개발자 도 이렇게 했었다 페이지 기반인 php가 나오기 시작하면서 페이지 기반의 프로그램을 만들기 시작했다. 페이지기반으로 나오면서 jsp도 나중에 추가되었다.
+
+이렇게 실행해보면 전에 했던 html문서와 현재 서블릿 문서가 똑같아 보인다. 무슨 차이가 있을까? 다를게 뭐가있을까? 
+html같은경우에는 3+4로 하면 그냥 3+4로 출력되지만 
+서블릿은 out.printf("<td class=\"output\" colspan=\"4\">%d</td>",3+4); 로 하면 7로 출력된다
+
+원하는 값을 넣을수도있고 계산도 가능하기때문에 동적인문서를 만들어야하는 이유가 생겼다.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
