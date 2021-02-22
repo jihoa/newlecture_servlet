@@ -278,9 +278,124 @@ MVC model1:코드를 모델을 이용해서 V와 C로 나눠서 만드는 방식
 모델1 방식을 만들때 가장중요하게 봐야하는것은 자바코드와  출력코드를 최대한 분리시키자. 그걸 가능하게 하기 위해서 모델이란 특수한 변수가 따로 사용되는데
 적절하게 이용할수있으면, 출력코드로부터 컨트롤러 관련된 제어 관련된 코드를  몰아낼수있다. 코드 양분화 가능
 
+-spag.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+	int num = 0;
+	String num_=request.getParameter("n");
+	if(num_ != null && !num_.equals(""))
+		num= Integer.parseInt(num_);
+	String result;
+	
+	if(num %2 !=0)
+		result="홀수";
+	else
+		result="짝수";
+	 %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%=result %>입니다.
+</body>
+</html>
+
+업무로직을 구성할때 훨씬 더 쉽게 유지 보수할수있다. 출력을 관리하는사람또한 자바코드가없으니까 훨씬더 쉽게 코드를 구성가능
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+46 JSP MVC model1을 model2 방식으로
+
+오늘은 지난시간 설명했던 model1을 model2로 바꿔보자.
+
+model 1: 컨트롤러와 뷰가 물리적으로 분리되지 않은 방식
+
+전에 model1에서 프로그램을 만들때는 코드라는 블럭을 JSP 전체 영역에서 흩어서 사용하는것은 바람직하지 않다고 했다.
+그래서 자바코드를 올렸다(controller). 그것이 가능하기 위해서는 model이라는 변수가 있어서 가능했다. 
+출력을 위한 변수(model)을 준비하기 위한 코드가 위에 올려둔 자바코드(controller)에서 만들어지게 되고 그 model을 가지고 JSP에서 사용하게된다.
+
+Controller를 JSP에 놓을지 아니면 분리할지를 생각해보자
+
+아예 분리해서 Servlet으로 올려놓는 방법을 생각해보자 사용자의 요청이 있을때 Servlet으로 만들어지는것이 아니라 View단만 사용자의 요청이 있을떄 Servlet으로 만들어지니까
+서블릿으로 만들 분량이 줄어들고 Controller단은 미리 컴파일해서 배치해놓을수 있기떄문에 실행속도가 개선될뿐만아니라 자바코드 작성하는 부분과 분리되있기때문에 유지보수가 간편해진다.
+여러가지 장점이 많다. model2의 핵심이다.
+
+model2에서는 Controller 와 View를 분리하는것이 핵심이다. 물리적으로 Controller와 View가 분리했는지에 따라서 model1과 model2 의 큰 차이이다.
+
+Controoler에서 View를 연결하게 위해서 포워딩하는 방법이 포함된다 .Controller(서블릿)에서 View(jsp로 되어있지만 서블릿)에서 이전되면서 그흐름을 이어받아서
+코드를 진행할때 사용되는것이 포워딩이라고 하는데 포워딩을 하게되면 Dispatcher를 통해서 포워딩을 하게된다.
+View가 늘어나면 Controller로 도 같이 늘어날텐데 그럴때마다 컨트롤러는 Dispacher를 사용해서 포워딩하게된다.
+그럼 어떻게 보면 모든 Controller가 갖고있는 공통적인 Dispatcher의 기능이 비효율적으로 보일수있다. Dispatcher라는 녀석을 하나만 두고 숫자의 컨트롤러의 기능만 담는녀석을 별도로 분리하는 작업을 한다.
+
+실질적으로 (Dispatcher)서블릿은 하나만 만들고  일반적인 업무로직(Controller)는 POJO 클래스라고 해서 서블릿 클래스가 아닌 일반 클래스형태로 클래스를 만들어서 사용자 요청이 들어오게 되면
+Dispatcher가 사용자 요청을 수반해서 적절한 컨트롤러를 찾아서 수행하게 하는 방식으로 진행을 한다.
+그 사이 Controller 에서는 진행한 로직에 해당하는 뷰를 호출할수있도록 Dispatcher에게 관련된 내용을 알려주면 Dispatcher가 그걸가지고 호출하게되는 형태이다.
+
+Model2는 지난번에 있는 예제와 비슷하다. 다만 물리적으로 분리되어있는가 아닌가의 차이이다.
+
+
+-spag.java를 추가하자
+
+package com.newlecture.web;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/spag")					//매핑을 해야하기때문에 매핑
+public class Spag extends HttpServlet{				//서블릿 코드로 만들기 때문에 HttpServlet extends하자
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		//doget이라는 메서드 오버라이드
+		int num = 0;
+		String num_=request.getParameter("n");
+		if(num_ != null && !num_.equals(""))
+			num= Integer.parseInt(num_);
+		String result;
+		
+		if(num %2 !=0)
+			result="홀수";
+		else
+			result="짝수"
+
+		request.setAttribute("request", result);				//request에다가 SetAttribute result라고하면 result를 담겠다.꺼낼때는 request로 꺼내겠다.
+
+		//redirect : 현재 작업한 내용과 전혀 상관없이 새로운 요청을 하게함
+		//forward: 현재 작업한 내용을 이어갈수있도록 무언가를공유
+
+		RequestDispatcher dispatcher
+			= request.getRequestDispatcher("spag.jsp");		//우리가 하고싶은것은 포워딩이다. 그것을 하기위해 쓰는것이 getRequestDispatcher()이다. 괄호에 현재 Spag의 url을 요청했을때 요청을 spag.jsp로 전달하려고 경로를 넣었다. url상으로 같은디렉토리에 있다고 생각하기에 경로를 안넣음
+		dispatcher.forward(request,response);				//forward의 특징은 괄호안에 현재 작업했던 내용을 담을수있다.request와 response도 공유가능 그내용들이 spag.jsp로 이어져서 요청이 진행됨 spag.jsp는 서블릿이기때문에 spag.jsp로 이어지면 request와 response가 똑같기 때문에 spag.java의 내용을 이어갈수있다.
+									//forward 관계에 있는 둘 사이의 저장소로서 request가 사용된다.
+									//어떤 상태를 사용할때 사용할수있는 저장소 4가지 			
+									//1. 페이지 컨텍스트: 페이지 내에서 혼자 사용함
+									//2. Request: 포워드 사이의 둘사이의 저장소
+									//3. 세션: 세션에서 공유될수있는 저장소
+									//4. (어플리케이션)페이지: 모든 세션 모든페이지에서 공유될수있는 저장소
+									//쿠키 제외하고 서버상의 저장소는 4가지이다.
+	}
+}
+
+
+-spag.jsp
+
+<%=request.getAttribute("result") %>입니다.		//<%=result %>입니다. 에서 바꿈
+
+실행할때는 무조건 컨트롤러인 spag.java(컨트롤러) 에서 실행해야한다. 컨트롤러가 데이터를 만들어야 출력할것이 있기때문이다.
+
+모델 1 => 모델2 
+물리적으로 완전히 코드가 분리되었다. 한쪽은 컨트롤러는 새로운 클래서에다가 서블릿으로 담당하게된다. 한쪽은 view단(html)
+아직 프론트 컨트롤을 분리하지않았다.
+뷰단에서 아직 완전하게 자바 코드가 사라지지않았다. 완전히 몰아내는 방법을 알기위해 EL을 배우도록 할것이다.
+<%=request.getAttribute("result") %>입니다.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
