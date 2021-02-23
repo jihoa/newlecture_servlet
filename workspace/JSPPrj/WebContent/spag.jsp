@@ -16,7 +16,7 @@ pageContext.setAttribute("result","hello");
 	${names[1]}<br >
 	${notice.id}<br >
 	${result}<br >
-	${param.n}<br>
+	${param.n/2}  <br>
 	${header.accept}
 </body>
 </html>
