@@ -592,10 +592,51 @@ DB가 준비되어있어야한다. Oracle로 사용할것이고 수업시간에�
 
 52 JDBC를 이용해 글 목록 구현하기
 
+데이터베이스에 있는 목록을 가져다가 글 목록을 채우는 작업을 알아보려고한다. 
 
+		<% 
+		String url = "jdbc:oracle:thin:@192.168.77.1:1521/xepdb1";
+		String sql = "SELECT * FROM NOTICE";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con= DriverManager.getConnection(url,"NEWLEC","1234");
+		Statement st = con.createStatement();
+		ResultSet rs= st.executeQuery(sql);
+		%>
 
+복사해서 데이터베이스를 사용할 JSP에다가 코드 상단에 코드블럭을 만들고 붙여넣기 해준다.
 
+맨 아래에도 종료하는 쿼리를 적어주자.
 
+    	<% 
+	rs.close();
+	st.close();
+	con.close();
+	%>
+이렇게 하게되면 Connection Statement ResultSet에 빨간줄이 그이게 된다. import를 안해서 그렇다. 자바때와 똑같이 ctrl+spacebar를 눌러서 임포트해주자
+<%@page import="java.sql.Connection"%>	//페이지 지시자를 통해서 임포트에다가 넣어달라고 말하는것이다.
+
+<% while(rs.next()){ %>
+							
+		<tr>
+			<td> <%=rs.getInt("ID")%> </td>
+			<td class="title indent text-align-left"><a href="detail.html"><%= rs.getString("TITLE") %></a></td>
+			<td><%=rs.getString("WRITER_ID") %></td>
+			<td>
+				<%=rs.getDate("REGDATE")%>	
+			</td>
+			<td><%=rs.getInt("HIT")%></td>
+		</tr>
+					
+<% } %>
+
+이렇게 적어주고 실행하게되면 java.lang.ClassNotFoundException:oracle.jdbc.driver.OracleDriver 에러가 발생한다.
+클래스가 없다는것이다. JDBC를 사용하려면 JDBC Driver를 사용해야하는데 저번시간에 사용했던 드라이버는 external jar로 설정했는데 안해서 그렇다.
+ Build Path에다가 원래 설정했었는데 웹프로젝트는 그렇게하면안된다.
+웹개발할때는  프로젝트에서 실행하고 배포하는것이아니다. 톰캣이하는것이다. 웹개발할때는 웹에서 사용하는 라이브러리가 어딘가로 배포되어 사용되기때문에
+라이브러리를 같이가져가야한다. 라이브러리는 단순하게 jar파일이 어디있습니다. 라고 하는 경로를 지정하는 Build Path를 설정하는것이아니라.
+라이브러리를 포함해야한다.
+WEB-INF안에 lib에다가 jar파일을 담아야한다. 물론 Java실행환경이나 톰캣라이브러리는 담지않아도 된다. ojdbc.jar파일을 lib에 넣고 실행하니까 에러가 없어졌다.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
