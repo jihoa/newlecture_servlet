@@ -640,7 +640,45 @@ WEB-INF안에 lib에다가 jar파일을 담아야한다. 물론 Java실행환경
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+53 자세한 페이지 구현하기
 
+JDBC를 이용해서 오라클 서버에 있는 목록 페이지를 구현해봤다. 그 다음 구현할 내용은 자세한 페이지를 구현할것이다.
+자세한 페이지 만들때 중요한점이있는데 , 자세한페이지를 갈때는 detail.jsp?id=9 이런식으로 9번에 대한 아이디에 해당하는 페이지로 간다는것이다.
+id라는 값을 전달하지않으면 오류가 나야할것이다. 그러면 id값을 어떻게 심을수 있을까?
+
+<td class="title indent text-align-left"><a href="detail.jsp?id=<%=rs.getInt("ID")%>"><%= rs.getString("TITLE") %></a></td>
+이런식으로 값을 심을수 있다.
+
+String sql = "SELECT * FROM NOTICE WHERE ID=?";
+? 형태의 값을 채울수 있도록 하는 스테이트먼트가 따로있다. 그것을 PreparedStatement라고한다. 
+원래 Statement인 Statement st = con.createStatement();
+는 실행도구의 의무를 가장크게 가지고있는데 PreparedStatement라고 하면 얘기가 달라진다.
+
+PreparedStatement st = con.prepareStatement(sql);
+쿼리문을 넘겨받은다음에 실행할때는 미리 준비한 쿼리문을 실어서 실행한다.
+ResultSet rs= st.executeQuery();
+
+그래서 실행할때는 미리준비한 쿼리문을 실행하기때문에 executeQuery에 sql을 넣으면 안된다. preparedStatement에는 미리 준비하는 능력이 있기때문이다.
+미리 준비한다는것은 물음표가 있어서 그 물음표를 채우기 위한 능력이 포함된것이다.
+
+st.setInt(1,id); 	//첫번째 인자: 첫번째, 두번째인자: 무엇을 꽂아넣을건지 id를 꽂아놓을것이다.
+rs.next();		//서버에서 레코드 하나를 가져오는것이고 그걸 사용하면된다.
+
+<% 
+	int id = Integer.parseInt(request.getParameter("id"));
+    
+String url = "jdbc:oracle:thin:@192.168.77.1:1521/xepdb1";
+String sql = "SELECT * FROM NOTICE WHERE ID=?";
+
+Class.forName("oracle.jdbc.driver.OracleDriver");
+Connection con= DriverManager.getConnection(url,"NEWLEC","1234");
+PreparedStatement st = con.prepareStatement(sql);
+st.setInt(1,id);
+ResultSet rs= st.executeQuery();
+
+rs.next();
+
+%>    
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
