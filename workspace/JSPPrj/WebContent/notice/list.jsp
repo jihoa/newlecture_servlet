@@ -5,7 +5,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
-<%String url = "jdbc:oracle:thin:@192.168.77.1:1521/xepdb1";
+<%
+String url = "jdbc:oracle:thin:@192.168.77.1:1521/xepdb1";
 String sql = "SELECT * FROM NOTICE";
 
 Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -193,7 +194,7 @@ ResultSet rs= st.executeQuery(sql);
 							
 					<tr>
 						<td> <%=rs.getInt("ID")%> </td>
-						<td class="title indent text-align-left"><a href="detail.jsp?id=<%=rs.getInt("ID")%>"><%= rs.getString("TITLE") %></a></td>
+						<td class="title indent text-align-left"><a href="detail?id=<%=rs.getInt("ID")%>"><%= rs.getString("TITLE") %></a></td>
 						<td><%=rs.getString("WRITER_ID") %></td>
 						<td>
 							<%=rs.getDate("REGDATE")%>	
