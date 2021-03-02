@@ -739,6 +739,113 @@ detail.jsp를 요청하면서 현재 사용하고있는 저장소객체(request)
  
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+56 Model 데이터를 구조화하기
+
+코드를 또한번 변화시킬것이다. controller와 view단을 나눴었다. 꼭 나누지않아도된다. 숙련도에따라 상황에따라 그때 맞게해야한다.
+만드는 방법은 만드는 사람이 어떤방법이 유지보수하기 편하다에 따라 달라지는 것인데 일반적인 기업용은 나누는 것을 좋아한다.
+데이터를 구조화 하지않았기때문에 마무리 하지않았다.
+
+개념적으로 말할수있는 데이터의 집합 엔티티(개체) 라고 한다.
+데이터를 낱개로 보기보다 묶어서 사용하는것을 좋아한다.
+
+			request.setAttribute("title", title);
+			request.setAttribute("writerId", writerId);
+			request.setAttribute("regdate", regdate);
+			request.setAttribute("hit", hit);
+			request.setAttribute("files", files);
+			request.setAttribute("content", content);
+이런데이터들을 한단어로 표현하면 공지사항이라고 할수있다.
+묶어서 
+request.addAttribute("n",notice);	로 하나로 묶을수가 있다.
+
+-Notice.java
+
+public class Notice {
+	private int id;
+	private String title;
+	private String writerId;
+	private Date regdate; 
+	private String hit;
+	private String files;
+	private String content;
+	//데이터를 채우기위해 세터를 준비할텐데 그거보다는 생성자를 준비해서 생성자로 채우자
+	//마운스 오른쪽 source=> generate construct using Field
+	//오버로드 생성자가 생성됨 그러면 기본생성자를 생성할것인지 말것인지 판단해야함 컴파일러가 안만들어주니까 기본생성자 추가하기위해 ctrl space누르면 기본생성자를 생성할수있다.
+	
+	public Notice() {
+		// TODO Auto-generated constructor stub
+	}
+	public Notice(int id, String title, String writerId, Date regdate, String hit, String files, String content) {
+		this.id = id;
+		this.title = title;
+		this.writerId = writerId;
+		this.regdate = regdate;
+		this.hit = hit;
+		this.files = files;
+		this.content = content;
+	}
+	//source=> Generate Getters and Setters 에서 모두선택
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getWriterId() {
+		return writerId;
+	}
+	public void setWriterId(String writerId) {
+		this.writerId = writerId;
+	}
+	public Date getRegdate() {
+		return regdate;
+	}
+	public void setRegdate(Date regdate) {
+		this.regdate = regdate;
+	}
+	public String getHit() {
+		return hit;
+	}
+	public void setHit(String hit) {
+		this.hit = hit;
+	}
+	public String getFiles() {
+		return files;
+	}
+	public void setFiles(String files) {
+		this.files = files;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}  
+	//나중에 가지고있는 값을 테스트해보고싶으면 toString을 오버라이드해서 바꿔주면된다
+	//source=> Generate toString 에서 모두선택
+	//컬럼들을 출력하는 방식으로 오버라이드 해준다. 나중에 요긴하게 출력해볼수있음
+	@Override
+	public String toString() {
+		return "Notice [id=" + id + ", title=" + title + ", writerId=" + writerId + ", regdate=" + regdate + ", hit="
+				+ hit + ", files=" + files + ", content=" + content + "]";
+	}
+}
+
+view단에서 받을때는 간단하게 EL을 사용해서 표현할수있다.  ${n.title}
+
+게터 세터가 뭔지 공부하기!
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
