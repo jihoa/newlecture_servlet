@@ -56,6 +56,7 @@ public class NoticeDetailController extends HttpServlet {
 					files,
 					content
 					);
+			
 			request.setAttribute("n", notice);
 			
 			

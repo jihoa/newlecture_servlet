@@ -1,3 +1,6 @@
+<%@page import="java.util.List"%>
+<%@page import="com.newlecture.web.entity.Notice"%>
+<%@page import="java.util.Date"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.Statement"%>
 <%@page import="java.sql.DriverManager"%>
@@ -14,6 +17,28 @@ Connection con= DriverManager.getConnection(url,"NEWLEC","1234");
 Statement st = con.createStatement();
 ResultSet rs= st.executeQuery(sql);
 
+ while(rs.next()){ 
+ 	int id = rs.getInt("ID");
+ 	String title=rs.getString("TITLE");
+	String writerId=rs.getString("WRITER_ID");
+	Date regdate=rs.getDate("REGDATE"); 
+	String hit=rs.getString("HIT");
+	String files=rs.getString("FILES");
+	String content=rs.getString("CONTENT"); 
+
+	Notice notice= new Notice(
+			id,
+			title,
+			writerId,
+			regdate,
+			hit,
+			files,
+			content
+			);
+} 
+ 	rs.close();
+	st.close();
+	con.close();
 
 %>    
     
@@ -190,19 +215,21 @@ ResultSet rs= st.executeQuery(sql);
 					</thead>
 					<tbody>
 					
-					<% while(rs.next()){ %>
+					
+					<%
+					List<Notice> list = (List<Notice>)request.getAttribute("list");
+					for(Notice n : list) {
+						pageContext.setAttribute("n", n);
+					%>
 							
 					<tr>
-						<td> <%=rs.getInt("ID")%> </td>
-						<td class="title indent text-align-left"><a href="detail?id=<%=rs.getInt("ID")%>"><%= rs.getString("TITLE") %></a></td>
-						<td><%=rs.getString("WRITER_ID") %></td>
-						<td>
-							<%=rs.getDate("REGDATE")%>	
-						</td>
-						<td><%=rs.getInt("HIT")%></td>
+						<td>${n.id}</td>
+						<td class="title indent text-align-left"><a href="detail?id=${id}"></a>${n.title}</td>
+						<td>${n.writerId}</td>
+						<td>${n.regdate}</td>
+						<td>${n.hit}</td>
 					</tr>
-					
-					<% } %>
+					<%} %>
 					
 					
 					
@@ -278,8 +305,3 @@ ResultSet rs= st.executeQuery(sql);
     </body>
     
     </html>
-    <% 
-    rs.close();
-	st.close();
-	con.close();
-	%>
