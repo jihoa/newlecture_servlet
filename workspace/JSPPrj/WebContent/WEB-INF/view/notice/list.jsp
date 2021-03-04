@@ -1,47 +1,10 @@
 <%@page import="java.util.List"%>
 <%@page import="com.newlecture.web.entity.Notice"%>
-<%@page import="java.util.Date"%>
-<%@page import="java.sql.ResultSet"%>
-<%@page import="java.sql.Statement"%>
-<%@page import="java.sql.DriverManager"%>
-<%@page import="java.sql.Connection"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     
-<%
-String url = "jdbc:oracle:thin:@192.168.77.1:1521/xepdb1";
-String sql = "SELECT * FROM NOTICE";
 
-Class.forName("oracle.jdbc.driver.OracleDriver");
-Connection con= DriverManager.getConnection(url,"NEWLEC","1234");
-Statement st = con.createStatement();
-ResultSet rs= st.executeQuery(sql);
-
- while(rs.next()){ 
- 	int id = rs.getInt("ID");
- 	String title=rs.getString("TITLE");
-	String writerId=rs.getString("WRITER_ID");
-	Date regdate=rs.getDate("REGDATE"); 
-	String hit=rs.getString("HIT");
-	String files=rs.getString("FILES");
-	String content=rs.getString("CONTENT"); 
-
-	Notice notice= new Notice(
-			id,
-			title,
-			writerId,
-			regdate,
-			hit,
-			files,
-			content
-			);
-} 
- 	rs.close();
-	st.close();
-	con.close();
-
-%>    
-    
 <!DOCTYPE html>
 <html>
 
@@ -216,12 +179,13 @@ ResultSet rs= st.executeQuery(sql);
 					<tbody>
 					
 					
-					<%
+					<%-- <%
 					List<Notice> list = (List<Notice>)request.getAttribute("list");
 					for(Notice n : list) {
 						pageContext.setAttribute("n", n);
-					%>
-							
+					%> --%>
+					
+					<c:forEach var="n" items="${list}">
 					<tr>
 						<td>${n.id}</td>
 						<td class="title indent text-align-left"><a href="detail?id=${n.id}">${n.title}</a></td>
@@ -229,7 +193,9 @@ ResultSet rs= st.executeQuery(sql);
 						<td>${n.regdate}</td>
 						<td>${n.hit}</td>
 					</tr>
-					<%} %>
+					</c:forEach>
+							
+					<%--<%} %> --%>
 					
 					
 					
