@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html>
@@ -77,7 +78,7 @@
                         <h1 class="hidden">고객메뉴</h1>
                         <ul class="linear-layout">
                             <li><a href="/member/home"><img src="/images/txt-mypage.png" alt="마이페이지" /></a></li>
-                            <li><a href="/notice/list.jsp"><img src="/images/txt-customer.png" alt="고객센터" /></a></li>
+                            <li><a href="/notice/list"><img src="/images/txt-customer.png" alt="고객센터" /></a></li>
                         </ul>
                     </nav>
 
@@ -164,7 +165,14 @@
 								</tr>
 								<tr>
 									<th>첨부파일</th>
-									<td colspan="3">${n.files}</td>
+									<td colspan="3" style="text-align:left; text-indent:10px;">
+									<c:forTokens var="fileName" items="${n.files}" delims="," varStatus="st">
+										<a href ="">${fileName }</a>
+										<c:if test="${!st.last}">
+										/
+										</c:if>
+									</c:forTokens>
+									</td>
 								</tr>
 								<tr class="content">
 									<td colspan="4">${n.content}</td>
@@ -174,7 +182,7 @@
 					</div>
 					
 					<div class="margin-top text-align-center">
-						<a class="btn btn-list" href="list.jsp">목록</a>
+						<a class="btn btn-list" href="list">목록</a>
 					</div>
 					
 					<div class="margin-top">
